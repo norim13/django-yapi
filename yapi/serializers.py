@@ -10,7 +10,6 @@ class BaseSerializer(object):
     """
     This class should be extended by all response data serializers.
     """
-    ""
       
     def to_simple(self, obj, user=None):
         """

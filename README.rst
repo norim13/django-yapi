@@ -140,9 +140,10 @@ By convention, Resource handlers reside in a file called ``handlers.py`` in the 
     # myapp/api/handlers.py
     # ============
 
+	from yapi.resource import Resource
     from yapi.response import HTTPStatus, Response
 
-    class ResourceIndex:
+    class ResourceIndex(Resource):
         """
         API endpoint handler.
         """
@@ -172,7 +173,7 @@ Now we map the handler to a given URL::
     from handlers import ResourceIndex
 
     urlpatterns = patterns('',
-        url(r'^/?$', Resource(ResourceIndex), name='index'),
+        url(r'^/?$', ResourceIndex.as_view(), name='index'),
     )
     
 This way, if put ``http://localhost:8000/api/myapp`` in the address bar of your browser, you should get a JSON object
@@ -223,9 +224,10 @@ something like this::
     # ============
 
     from yapi.authentication import SessionAuthentication, ApiKeyAuthentication
+    from yapi.resource import Resource
     from yapi.response import HTTPStatus, Response
 
-    class ResourceIndex:
+    class ResourceIndex(Resource):
         """
         API endpoint handler.
         """
@@ -287,7 +289,7 @@ Now, add it to the API's root URL::
     
     urlpatterns = patterns('',
         # all other api url mappings
-        url(r'^/?$', Resource(ResourcesListHandler), name='index'),
+        url(r'^/?$', ResourcesListHandler.as_view(), name='index'),
         url(r'^/myapp', include('myapp.api.urls', namespace='myapp')),
     )
     
@@ -296,10 +298,11 @@ And write the respective handler::
     # myproject/api/handlers.py
     # ============
   
+  	from yapi.resource import Resource
     from yapi.response import HTTPStatus, Response
     from resources import get_api_resources_list
 
-    class ResourcesListHandler:
+    class ResourcesListHandler(Resource):
         """
         API endpoint handler.
         """

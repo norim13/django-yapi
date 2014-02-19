@@ -1,30 +1,26 @@
 import datetime
 import json
 import logging
+from django.middleware.csrf import CsrfViewMiddleware
 from django.http.response import HttpResponseNotAllowed, HttpResponse, HttpResponseForbidden
+from django.views.decorators.csrf import csrf_exempt
 
 from authentication import AnyAuthentication
 from models import ApiCall
 from response import HTTPStatus, Response
+from django.views.generic.base import View
 
 # Instantiate logger.
 logger = logging.getLogger(__name__)
 
 
-class Resource:
+class Resource(View):
     """
     Maps an API endpoint URL to its respective handler.
     """
-    
-    def __init__(self, handler):
-        """
-        Constructor.
-        """
-        if not callable(handler):
-            raise AttributeError, "Handler not callable."
-        self.handler = handler()
         
-    def __call__(self, request, *args, **kwargs):
+    @csrf_exempt
+    def dispatch(self, request, *args, **kwargs):
         """
         Call handler's method according to request HTTP verb.
         """
@@ -45,15 +41,15 @@ class Resource:
         
         # Check if verb is allowed.
         try:
-            self.handler.allowed_methods.index(method.upper())
+            self.allowed_methods.index(method.upper())
         except ValueError:
-            return HttpResponseNotAllowed(self.handler.allowed_methods)
+            return HttpResponseNotAllowed(self.allowed_methods)
         # Variable containing allowed verbs does not exist, no verbs allowed then.
         except AttributeError:
             return HttpResponseNotAllowed([])
         
         # If verb is available, respective method must exist.
-        meth = getattr(self.handler, method.lower(), None)
+        meth = getattr(self, method.lower(), None)
         if not meth:
             return HttpResponse(status=HTTPStatus.SERVER_ERROR_501_NOT_IMPLEMENTED)
         
@@ -64,7 +60,7 @@ class Resource:
         try:
             # If authentication is required, then the handler has the following attribute
             # consisting of an array of the available authentication types.
-            authentication_classes = self.handler.authentication
+            authentication_classes = self.authentication
             authentication = None
             
             # Check for valid credentials for each of the available authentication types.
@@ -92,6 +88,19 @@ class Resource:
         # Put the result of the authentication in the request object, as it may be used in executing the API call
         # (e.g. figuring out how to serialize objects, given the user permissions)
         request.auth = authentication
+        
+        ##################################
+        #        CSRF Validation         #
+        ##################################
+        
+        # When request is anonymous or authenticated via Django session, explicitly perform CSRF validation.
+        if not request.auth or request.auth['class'] == 'SessionAuthentication':
+            reason = CsrfViewMiddleware().process_view(request, None, (), {})
+            # CSRF Failed.
+            if reason:
+                return HttpResponse(content=json.dumps({ 'message': 'CSRF verification failed. Request aborted.' }),
+                                    status=HTTPStatus.CLIENT_ERROR_403_FORBIDDEN,
+                                    mimetype='application/json')
             
         ##################################
         #          Authorization         #
@@ -100,7 +109,7 @@ class Resource:
         try:
             # If specific permissions are required, then the handler has the following attribute
             # consisting of an array of the required permissions.
-            permission_classes = self.handler.permissions
+            permission_classes = self.permissions
             
             # If there are permission restrictions, then the request must be authenticated.
             if not authentication:
