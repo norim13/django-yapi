@@ -115,4 +115,4 @@ class Response(HttpResponse):
         # Build HTTP response.
         super(Response, self).__init__(content=encoder.encode(response),
                                        status=status,
-                                       mimetype=encoder.get_mimetype())
+                                       content_type=encoder.get_mimetype())

@@ -57,10 +57,38 @@ class Resource(View):
         #         Authentication         #
         ##################################
         
+        #
+        # 1) Check for authentication requirements.
+        #
+        
+        ####
+        # a) Handler-wide authentication (i.e. ALL methods require auth) ------>
         try:
             # If authentication is required, then the handler has the following attribute
             # consisting of an array of the available authentication types.
             authentication_classes = self.authentication
+        # <------ No handler-wide authentication required.
+        except AttributeError:
+        
+            ####
+            # b) Check for method-specific authentication requirements. ------>
+            try:
+                # If authentication is required, the respective method decorator adds the array of
+                # available authentication types to the following method var.
+                authentication_classes = meth.authentication
+            # <------ No method-specific authentication required.
+            except AttributeError:
+                
+                ####
+                # c) If this place is reached, then NO auth is required. Period. ------>
+                authentication_classes = None
+                # <------
+        
+        #
+        # 2) Authentication is required! Check for any valid auth credentials, according to available auth types.
+        #
+        if authentication_classes:
+            
             authentication = None
             
             # Check for valid credentials for each of the available authentication types.
@@ -79,8 +107,10 @@ class Resource(View):
             if not authentication:
                 return HttpResponse(status=HTTPStatus.CLIENT_ERROR_401_UNAUTHORIZED)
         
-        # No authentication is required.
-        except AttributeError:
+        #
+        # 3) No authentication is required.
+        #
+        else:
             # Even though authentication is not required, check if request was made by an
             # authenticated user, for logging purposes. 
             authentication = AnyAuthentication().authenticate(request)
@@ -106,10 +136,37 @@ class Resource(View):
         #          Authorization         #
         ##################################
         
+        #
+        # 1) Check for permission requirements.
+        #
+        
+        ####
+        # a) Handler-wide permissions (i.e. ALL methods same permissions) ------>
         try:
             # If specific permissions are required, then the handler has the following attribute
             # consisting of an array of the required permissions.
             permission_classes = self.permissions
+        # <------ No handler-wide permissions required.
+        except AttributeError:
+        
+            ####
+            # b) Check for method-specific permission requirements. ------>
+            try:
+                # If permission is required, the respective method decorator adds the array of
+                # required permission types to the following method var.
+                permission_classes = meth.permission
+            # <------ No method-specific permissions required.
+            except AttributeError:
+                
+                ####
+                # c) If this place is reached, then are NOT permission requirements. Period. ------>
+                permission_classes = None
+                # <------
+                
+        #
+        # 2) Validate permissions.
+        #
+        if permission_classes:
             
             # If there are permission restrictions, then the request must be authenticated.
             if not authentication:
@@ -127,7 +184,7 @@ class Resource(View):
                         return HttpResponseForbidden()
                 
         # There aren't any permission restrictions.
-        except AttributeError:
+        else:
             pass
         
         ##################################
