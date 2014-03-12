@@ -266,12 +266,10 @@ class Resource(View):
                         request_data=request_data,
                         response_data=response_data)
         
+        # If error occurs, JUST log. If this place is reached, then the request was successfully
+        # executed and result should be returned.
         except:
             logger.error('Unable to log API call!', exc_info=1)
-            return Response(request=request,
-                            data={ 'message': 'Resource #2' },
-                            serializer=None,
-                            status=HTTPStatus.SERVER_ERROR_500_INTERNAL_SERVER_ERROR)
         
         ##################################
         #             Return             #
