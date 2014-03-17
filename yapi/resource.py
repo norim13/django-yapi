@@ -263,6 +263,7 @@ class Resource(View):
                         status=result.status_code,
                         user_agent=user_agent,
                         authentication=authentication,
+                        request_get_params=dict(request.GET.iterlists()),
                         request_data=request_data,
                         response_data=response_data)
         

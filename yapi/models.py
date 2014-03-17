@@ -39,6 +39,7 @@ class ApiCall(models.Model):
     authentication_class = models.CharField(max_length=50, blank=True)
     authentication_user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     authentication_token = models.CharField(max_length=200, blank=True)
+    request_get_params = models.TextField(blank=True)
     request_data = models.TextField(blank=True)
     response_data = models.TextField(blank=True)
     
@@ -55,7 +56,8 @@ class ApiCall(models.Model):
         return round((self.execution_end - self.execution_start).microseconds / float(1000000), 3)
     
     @staticmethod
-    def new(date, method, endpoint, source_ip, execution_start, execution_end, status, user_agent, authentication=None, request_data=None, response_data=None):
+    def new(date, method, endpoint, source_ip, execution_start, execution_end, status, user_agent,
+            authentication=None, request_get_params=None, request_data=None, response_data=None):
         """
         Logs an API call.
         """
@@ -90,6 +92,8 @@ class ApiCall(models.Model):
                 api_call.authentication_token = authentication_token
                 
         # If request/response data provided.
+        if request_get_params:
+            api_call.request_get_params = request_get_params
         if request_data:
             api_call.request_data = request_data
         if response_data:
