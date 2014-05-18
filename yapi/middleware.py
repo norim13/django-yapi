@@ -15,8 +15,8 @@ class XsSharing(object):
     def process_request(self, request):
         if 'HTTP_ACCESS_CONTROL_REQUEST_METHOD' in request.META:
             response = http.HttpResponse()
-            response['Access-Control-Allow-Origin']  = settings['YAPI']['XS_SHARING_ALLOWED_ORIGINS'] 
-            response['Access-Control-Allow-Methods'] = ",".join(settings['YAPI']['XS_SHARING_ALLOWED_METHODS'])
+            response['Access-Control-Allow-Origin']  = settings.YAPI['XS_SHARING_ALLOWED_ORIGINS'] 
+            response['Access-Control-Allow-Methods'] = ",".join(settings.YAPI['XS_SHARING_ALLOWED_METHODS'])
             response['Access-Control-Allow-Headers'] = 'X-Requested-With, Authorization, X-Prototype-Version, Content-type'
             return response
         else:
@@ -27,7 +27,7 @@ class XsSharing(object):
         if response.has_header('Access-Control-Allow-Origin'):
             return response
         else:
-            response['Access-Control-Allow-Origin']  = settings['YAPI']['XS_SHARING_ALLOWED_ORIGINS'] 
-            response['Access-Control-Allow-Methods'] = ",".join(settings['YAPI']['XS_SHARING_ALLOWED_METHODS'])
+            response['Access-Control-Allow-Origin']  = settings.YAPI['XS_SHARING_ALLOWED_ORIGINS'] 
+            response['Access-Control-Allow-Methods'] = ",".join(settings.YAPI['XS_SHARING_ALLOWED_METHODS'])
             response['Access-Control-Allow-Headers'] = 'X-Requested-With, Authorization, X-Prototype-Version, Content-type'
             return response
