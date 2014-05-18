@@ -5,6 +5,7 @@ from django.http.response import HttpResponse
 
 from encoders import JSONEncoder
 from pagination import Paginator
+from serializers import BaseSerializer
 
 # Instantiate logger.
 logger = logging.getLogger(__name__)
@@ -91,6 +92,10 @@ class Response(HttpResponse):
                                  they are provided in this field.
         """
         
+        # Check if serializer is instantiated.
+        if not issubclass(serializer.__class__, BaseSerializer):
+            serializer = serializer()
+        
         # Encoder (default: JSON)
         encoder = JSONEncoder()
         
@@ -110,7 +115,7 @@ class Response(HttpResponse):
         
         # Serialize data.
         else:
-            response = serializer().serialize(data, user)
+            response = serializer.serialize(data, user)
         
         # Build HTTP response.
         super(Response, self).__init__(content=encoder.encode(response),

@@ -57,6 +57,18 @@ settings.py
     
 3. Make sure you have a 'HOST_URL' setting containing the address in which the app is deployed:
     ``HOST_URL = 'http://localhost:8000'`` (example)
+    
+4. If you want to use the middleware that enables CORS, you have to configure it by adding the following settings::
+
+    MIDDLEWARE_CLASSES = (
+        ...
+        'yapi.middleware.XsSharing'
+    )
+
+    YAPI = {
+        'XS_SHARING_ALLOWED_ORIGINS': '*', # The allowed domains
+        'XS_SHARING_ALLOWED_METHODS': ['POST','GET','OPTIONS', 'PUT', 'DELETE'] # ... and methods
+    }
 
 Logs
 ----

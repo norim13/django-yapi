@@ -10,6 +10,13 @@ class BaseSerializer(object):
     """
     This class should be extended by all response data serializers.
     """
+    
+    def __init__(self, **kwargs):
+        """
+        Constructor.
+        """
+        for key in kwargs.keys():
+            setattr(self, key, kwargs[key])
       
     def to_simple(self, obj, user=None):
         """

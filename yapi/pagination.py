@@ -15,7 +15,7 @@ class Paginator(object):
         """
         Constructor.
         """
-        self.serializer = serializer() 
+        self.serializer = serializer
     
     def get_results(self, request, data, user=None, filters=None):
         """
