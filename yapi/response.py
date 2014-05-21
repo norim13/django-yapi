@@ -93,7 +93,7 @@ class Response(HttpResponse):
         """
         
         # Check if serializer is instantiated.
-        if not issubclass(serializer.__class__, BaseSerializer):
+        if serializer != None and not issubclass(serializer.__class__, BaseSerializer):
             serializer = serializer()
         
         # Encoder (default: JSON)
