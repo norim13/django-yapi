@@ -66,8 +66,18 @@ settings.py
     )
 
     YAPI = {
+    	...
+    
         'XS_SHARING_ALLOWED_ORIGINS': '*', # The allowed domains
         'XS_SHARING_ALLOWED_METHODS': ['POST','GET','OPTIONS', 'PUT', 'DELETE'] # ... and methods
+    }
+    
+5. If you wish to disable ENTIRELY (be careful! :P) CSRF Validation, add the following settings::
+
+    YAPI = {
+    	...
+    	
+        'CSRFValidation': False
     }
 
 Logs

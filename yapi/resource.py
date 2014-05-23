@@ -1,14 +1,15 @@
 import datetime
 import json
 import logging
-from django.middleware.csrf import CsrfViewMiddleware
+from django.conf import settings
 from django.http.response import HttpResponseNotAllowed, HttpResponse, HttpResponseForbidden
+from django.middleware.csrf import CsrfViewMiddleware
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.base import View
 
 from authentication import AnyAuthentication
 from models import ApiCall
 from response import HTTPStatus, Response
-from django.views.generic.base import View
 
 # Instantiate logger.
 logger = logging.getLogger(__name__)
@@ -123,8 +124,15 @@ class Resource(View):
         #        CSRF Validation         #
         ##################################
         
+        # Check for possible configuration.
+        try:
+            csrf_enabled = settings.YAPI['CSRFValidation']
+        # By default, CSRF validation is enabled.
+        except (AttributeError, KeyError):
+            csrf_enabled = True
+        
         # When request is anonymous or authenticated via Django session, explicitly perform CSRF validation.
-        if not request.auth or request.auth['class'] == 'SessionAuthentication':
+        if csrf_enabled == True and (not request.auth or request.auth['class'] == 'SessionAuthentication'):
             reason = CsrfViewMiddleware().process_view(request, None, (), {})
             # CSRF Failed.
             if reason:
