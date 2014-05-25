@@ -62,6 +62,9 @@ class Resource(View):
         # 1) Check for authentication requirements.
         #
         
+        # Flags if the handler requires authentication (defaults to Yes, changed otherwise).
+        authentication_required = True
+        
         ####
         # a) Handler-wide authentication (i.e. ALL methods require auth) ------>
         try:
@@ -112,6 +115,8 @@ class Resource(View):
         # 3) No authentication is required.
         #
         else:
+            authentication_required = False
+            
             # Even though authentication is not required, check if request was made by an
             # authenticated user, for logging purposes. 
             authentication = AnyAuthentication().authenticate(request)
@@ -132,7 +137,7 @@ class Resource(View):
             csrf_enabled = True
         
         # When request is anonymous or authenticated via Django session, explicitly perform CSRF validation.
-        if csrf_enabled == True and (not request.auth or request.auth['class'] == 'SessionAuthentication'):
+        if csrf_enabled == True and authentication_required == True and (not request.auth or request.auth['class'] == 'SessionAuthentication'):
             reason = CsrfViewMiddleware().process_view(request, None, (), {})
             # CSRF Failed.
             if reason:
