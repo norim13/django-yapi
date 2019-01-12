@@ -1,6 +1,0 @@
-.project
-.pydevproject
-.settings
-dist/
-django_yapi.egg-info/
-*.pyc
