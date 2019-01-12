@@ -7,9 +7,8 @@ from django.middleware.csrf import CsrfViewMiddleware
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import View
 
-from authentication import AnyAuthentication
-from models import ApiCall
-from response import HTTPStatus, Response
+from .authentication import AnyAuthentication
+from .response import HTTPStatus, Response
 
 # Instantiate logger.
 logger = logging.getLogger(__name__)
@@ -251,39 +250,6 @@ class Resource(View):
             logger.error('Error executing API call', exc_info=1)
             result = HttpResponse(status=HTTPStatus.SERVER_ERROR_500_INTERNAL_SERVER_ERROR)
         exec_end = datetime.datetime.now()
-        
-        ##################################
-        #               Log              #
-        ##################################
-        
-        try:
-            request_data = None
-            response_data = None
-        
-            # If bad request, log request data (POST and PUT) and response body.
-            if result.status_code >= 400 and result.status_code <= 599:
-                if method == 'POST' or method == 'PUT':
-                    request_data = request.data
-                response_data = result.content
-            
-            # Log.
-            ApiCall.new(date=requested_at,
-                        method=method,
-                        endpoint=endpoint,
-                        source_ip=source_ip,
-                        execution_start=exec_start,
-                        execution_end=exec_end,
-                        status=result.status_code,
-                        user_agent=user_agent,
-                        authentication=authentication,
-                        request_get_params=dict(request.GET.iterlists()),
-                        request_data=request_data,
-                        response_data=response_data)
-        
-        # If error occurs, JUST log. If this place is reached, then the request was successfully
-        # executed and result should be returned.
-        except:
-            logger.error('Unable to log API call!', exc_info=1)
         
         ##################################
         #             Return             #

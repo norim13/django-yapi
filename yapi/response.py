@@ -3,9 +3,9 @@ import types
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponse
 
-from encoders import JSONEncoder
-from pagination import Paginator
-from serializers import BaseSerializer
+from .encoders import JSONEncoder
+from .pagination import Paginator
+from .serializers import BaseSerializer
 
 # Instantiate logger.
 logger = logging.getLogger(__name__)
