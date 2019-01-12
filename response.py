@@ -1,5 +1,4 @@
 import logging
-import types
 from django.db.models.query import QuerySet
 from django.http.response import HttpResponse
 
@@ -93,7 +92,7 @@ class Response(HttpResponse):
         """
         
         # Check if serializer is instantiated.
-        if serializer != None and not issubclass(serializer.__class__, BaseSerializer):
+        if serializer is not None and not issubclass(serializer.__class__, BaseSerializer):
             serializer = serializer()
         
         # Encoder (default: JSON)
@@ -110,7 +109,7 @@ class Response(HttpResponse):
             response = Paginator(serializer).get_results(request, data, user, filters)
             
         # Data is a Python dict, no need to serialize!
-        elif isinstance(data, types.DictType):
+        elif isinstance(data, dict):
             response = data
         
         # Serialize data.

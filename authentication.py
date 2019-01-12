@@ -27,7 +27,7 @@ class SessionAuthentication(BaseAuthentication):
         Please refer to the interface documentation.
         """        
         # There is an active user logged in.
-        if request.user.is_authenticated() and request.user.is_active:
+        if request.user.is_authenticated and request.user.is_active:
             return {
                 'class': self.__class__.__name__,
                 'user': request.user,
