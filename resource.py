@@ -14,7 +14,7 @@ from .response import HTTPStatus, Response
 logger = logging.getLogger(__name__)
 
 
-class Resource(Resource):
+class Resource(View):
     """
     Maps an API endpoint URL to its respective handler.
     """
