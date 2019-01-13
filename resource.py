@@ -216,23 +216,28 @@ class Resource(View):
                 if request.FILES:
                     request.data = request.FILES
                 
-                # Business as usual...
-                else:
+                # If there is a body to parse, do it.
+                elif request.body:
                     # For now, the only parser suported is JSON.
                     data = json.loads(request.body)
                     
                     # If this place is reached, then body was successfully parsed. Add it to the request object.
                     request.data = data
+
+                # If there's no body, just let it pass.
+                else:
+                    request.data = None
             
             # Error parsing request body to JSON.
             except ValueError:
                 return HttpResponse(content=json.dumps({'message': 'Missing arguments'}),
                                     status=HTTPStatus.CLIENT_ERROR_400_BAD_REQUEST,
-                                    mimetype='application/json')
+                                    content_type='application/json')
         except ValueError:
             pass
         except:
-            logger.error('Unable to process request body!', exc_info=1)
+            import traceback
+            logger.error('Unable to process request body! {!r}'.format(traceback.format_exc()), exc_info=1)
             return Response(request=request,
                             data={'message': 'Resource #1'},
                             serializer=None,
