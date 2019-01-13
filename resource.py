@@ -136,13 +136,13 @@ class Resource(View):
             csrf_enabled = True
         
         # When request is anonymous or authenticated via Django session, explicitly perform CSRF validation.
-        if csrf_enabled == True and authentication_required == True and (not request.auth or request.auth['class'] == 'SessionAuthentication'):
+        if csrf_enabled is True and authentication_required is True and (not request.auth or request.auth['class'] == 'SessionAuthentication'):
             reason = CsrfViewMiddleware().process_view(request, None, (), {})
             # CSRF Failed.
             if reason:
-                return HttpResponse(content=json.dumps({ 'message': 'CSRF verification failed. Request aborted.' }),
+                return HttpResponse(content=json.dumps({'message': 'CSRF verification failed. Request aborted.'}),
                                     status=HTTPStatus.CLIENT_ERROR_403_FORBIDDEN,
-                                    mimetype='application/json')
+                                    content_type='application/json')
             
         ##################################
         #          Authorization         #
@@ -205,7 +205,7 @@ class Resource(View):
          
         # Some requests require for a body.
         try:
-            ['POST', 'PUT'].index(method.upper())
+            ['DELETE', 'PATCH', 'POST', 'PUT', ].index(method.upper())
             
             # If this place is reached, then the HTTP request should have a body.
             try:
@@ -226,7 +226,7 @@ class Resource(View):
             
             # Error parsing request body to JSON.
             except ValueError:
-                return HttpResponse(content=json.dumps({ 'message': 'Missing arguments' }),
+                return HttpResponse(content=json.dumps({'message': 'Missing arguments'}),
                                     status=HTTPStatus.CLIENT_ERROR_400_BAD_REQUEST,
                                     mimetype='application/json')
         except ValueError:
@@ -234,7 +234,7 @@ class Resource(View):
         except:
             logger.error('Unable to process request body!', exc_info=1)
             return Response(request=request,
-                            data={ 'message': 'Resource #1' },
+                            data={'message': 'Resource #1'},
                             serializer=None,
                             status=HTTPStatus.SERVER_ERROR_500_INTERNAL_SERVER_ERROR)
         

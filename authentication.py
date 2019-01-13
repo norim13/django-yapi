@@ -31,7 +31,6 @@ class SessionAuthentication(BaseAuthentication):
             return {
                 'class': self.__class__.__name__,
                 'user': request.user,
-                'token': None
             }
         else:
             return None
