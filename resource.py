@@ -237,7 +237,7 @@ class Resource(View):
             pass
         except:
             import traceback
-            logger.error('Unable to process request body! {!r}'.format(traceback.format_exc()), exc_info=1)
+            logger.error('Unable to process request body! Stacktrace: {!r}'.format(traceback.format_exc()), exc_info=1)
             return Response(request=request,
                             data={'message': 'Resource #1'},
                             serializer=None,
